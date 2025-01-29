@@ -1,0 +1,5 @@
+.env
+postgresql/data
+django-admin.exe
+pipreqs.exe
+__pycache__

@@ -1,0 +1,5 @@
+Django
+django-ninja
+orjson
+psycopg2-binary
+reactpy

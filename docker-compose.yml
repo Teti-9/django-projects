@@ -1,0 +1,42 @@
+networks:
+  backend_network:
+    name: django_ninja_project
+
+services:
+  django-backend:
+    image: python:3.11-slim
+    container_name: django_ninja_project
+    restart: always
+    ports:
+      - "8000"
+    volumes:
+      - ./:/app
+    environment:
+      PYTHONUNBUFFERED: 1
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - postgresqldb_django
+    networks:
+      backend_network:
+        aliases:
+          - django_ninja_project
+
+  postgresqldb_django:
+    image: postgres:${POSTGRESQL_VERSION}
+    container_name: postgresqldb_django
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql/scripts:/docker-entrypoint-initdb.d/
+      - ./postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASS}
+    networks:
+      backend_network:
+        aliases:
+          - postgresql
