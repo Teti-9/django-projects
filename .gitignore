@@ -3,3 +3,4 @@ postgresql/data
 django-admin.exe
 pipreqs.exe
 __pycache__
+.idea
