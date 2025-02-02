@@ -16,7 +16,7 @@ def calorias(request, caloria: CaloriaSchema):
             macro = i[0]
             return JsonResponse({"Erro": f"Macronutriente *{macro.title()}* não pode ser negativo."}, status=400)
 
-    carboidrato = caloria.carbs * CARB
+    carboidrato = caloria.carboidrato * CARB
     proteina = caloria.proteina * PROTEINA
     gordura = caloria.gordura * GORDURA
 

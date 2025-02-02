@@ -1,6 +1,6 @@
 from ninja import Schema
 
 class CaloriaSchema(Schema):
-    carbs: int
+    carboidrato: int
     proteina: int
     gordura: int
