@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'volume',
     'users',
     'calories',
+    'usda',
 ]
 
 MIDDLEWARE = [
