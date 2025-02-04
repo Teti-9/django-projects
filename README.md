@@ -10,8 +10,9 @@ Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful
 
 - 🔥 **Cálculo Calórico:** Retorna calorias totais com base em macronutrientes enviados via POST.  
 
-- 🔐 **Autenticação:** Registro, login e logout de usuários.  
+- 🍖 **USDA API:** Query que retorna alimentos por meio de uma requisição HTTP.
 
+- 🔐 **Autenticação:** Registro, login e logout de usuários.
 ## 🛠️ Instalação e Configuração
 
 ### 🔹 Instalação Local (SQLite)
