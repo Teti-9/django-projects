@@ -11,7 +11,7 @@ class Testes(TestCase):
     def test_registrar(self):
         response = self.client.post('/api/registrar',
                                     {"username": "teste",
-                                     "email": "teste",
+                                     "email": "teste123",
                                      "password": "teste"},
                                      content_type="application/json")
         self.assertEqual(response.status_code, 200)

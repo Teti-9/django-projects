@@ -1,8 +1,8 @@
 from ninja import Schema
-from typing import Optional
+from typing import Optional, Union
 
 class ExercicioSchema(Schema):
-    id: int
+    id: Union[int, str]
     nome: str
     musculo: str
     musculo_residual: str

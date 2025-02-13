@@ -1,2 +1,2 @@
 def usuario(request):
-    return request.user.id
+    return getattr(request.user, "id", None) or request.session.get("user_id")

@@ -33,4 +33,4 @@ async def lista_alimentos(request, query: str):
             for item in foods.get('foods', [])
         ]
 
-        return JsonResponse({"Alimentos": foods_list}, status=200)
+        return JsonResponse({"Alimentos (100g)": foods_list}, status=200)

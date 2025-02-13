@@ -20,5 +20,5 @@ class Testes(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_exercicio_single_volume(self):
-        response = self.client.get(f'/api/exercicio/volumes/{self.exercicio.musculo}')
+        response = self.client.get(f'/api/exercicio/volume/{self.exercicio.musculo}')
         self.assertEqual(response.status_code, 200)
