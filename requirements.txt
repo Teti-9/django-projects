@@ -1,7 +1,9 @@
 Django
 django-ninja
+pymongo
 orjson
 psycopg2-binary
 reactpy
-googletrans
 python-dotenv
+argon2-cffi
+googletrans
