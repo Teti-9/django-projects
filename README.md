@@ -52,7 +52,11 @@ docker compose up -d
 ```
 Não é necessário editar o arquivo settings.py.
 
-Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
+Crie uma database MongoDB com as seguintes collections:
+muscleinfo_exercicio
+users
+
+Crie caso ainda não tenha um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 
 MONGODB_URL = "mongodb+srv://usuario:senha@nomedatabase.ourq7.mongodb.net/"
 DATABASE = "mongodb"
