@@ -5,6 +5,7 @@ from volume.api import router as volume
 from users.api import router as users
 from calories.api import router as calories
 from usda.api import router as usda
+from progression.api import router as progression
 import orjson
 
 class ORJSONParser(Parser):
@@ -18,3 +19,4 @@ api.add_router("/", volume)
 api.add_router("/", users)
 api.add_router("/", calories)
 api.add_router("/", usda)
+api.add_router("/", progression)

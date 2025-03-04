@@ -3,7 +3,6 @@ django-ninja
 pymongo
 orjson
 psycopg2-binary
-reactpy
 python-dotenv
 argon2-cffi
 googletrans

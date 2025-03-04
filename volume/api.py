@@ -21,7 +21,7 @@ def exercicio_volume_total(request):
     # exercicio = list_serial(db['muscleinfo_exercicio'].find({"user_id": usuario(request)}))
 
     if not exercicio:
-        return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
+        return JsonResponse({"Message": "Volume não encontrado"}, status=404)
 
     series = calcular_series(exercicio)
     residual = calcular_residual(exercicio)
