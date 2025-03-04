@@ -1,5 +1,6 @@
 from ninja import Router
 from ninja.responses import JsonResponse
+from django.utils import timezone
 from django.middleware.csrf import get_token
 from .models import Exercicio
 from .schemas import ExercicioSchema, ExercicioSchemaNoID, ExercicioSchemaEdit
@@ -21,8 +22,8 @@ def get_csrf_token(request):
 
 @router.post('/populardb', response = ExercicioSchema, auth=auth)
 def populardb(request, exercicio: ExercicioSchemaNoID):
-
     update_data = {}
+
     for key, value in exercicio.dict().items():
         if value is not None:
             update_data[key] = value.title() if isinstance(value, str) else value
@@ -35,6 +36,14 @@ def populardb(request, exercicio: ExercicioSchemaNoID):
     return exercicio
 
     # MONGODB
+    # new_values = {
+    #     "carga_anterior": 0,
+    #     "repeticoes_anterior": 0,
+    #     "data": timezone.now().strftime('%d/%m/%Y'),
+    #     "data_anterior": None
+    # }
+
+    # update_data.update(new_values)
     # exercicio = db['muscleinfo_exercicio'].insert_one(update_data)
     # update_data['id'] = str(exercicio.inserted_id)
     # return update_data
@@ -76,7 +85,7 @@ def procurar_exercicio_musculo(request, musculo: str):
         return exercicios
 
     except Exercicio.DoesNotExist:
-        return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
+        return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
     except Exception as e:
         return JsonResponse({"Message": f"Erro: {str(e)}"}, status=500)
 
@@ -87,6 +96,10 @@ def editar_exercicio(request, id: Union[int, str], exercicio: ExercicioSchemaEdi
         # SQL
         exercicio_obj = Exercicio.objects.get(id=id, user_id = usuario(request))
 
+        exercicio_obj.carga_anterior = exercicio_obj.carga
+        exercicio_obj.repeticoes_anterior = exercicio_obj.repeticoes
+        exercicio_obj.data_anterior = exercicio_obj.data
+
         for key, value in exercicio.dict().items():
             if value is None:
                 pass
@@ -96,17 +109,34 @@ def editar_exercicio(request, id: Union[int, str], exercicio: ExercicioSchemaEdi
                 else:
                     setattr(exercicio_obj, key, value)
 
+        exercicio_obj.data = timezone.now()
+
         exercicio_obj.save()
 
         # MONGODB
+        # id = ObjectId(id)
+        # exercicio_ = individual_serial(db['muscleinfo_exercicio'].find_one({"_id": id, "user_id": usuario(request)}))
+
+        # if not exercicio_:
+        #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
+        
+        # old_values = {
+        #     "carga_anterior": exercicio_["carga"],
+        #     "repeticoes_anterior": exercicio_["repeticoes"],
+        #     "data_anterior": exercicio_["data"]
+        # }
+
         # update_data = {}
+
         # for key, value in exercicio.dict().items():
         #     if value is not None:
         #         update_data[key] = value.title() if isinstance(value, str) else value
-        #
-        # id = ObjectId(id)
+
+        # update_data["data"] = timezone.now().strftime('%d/%m/%Y')
+        # update_data.update(old_values)
+
         # editar = db['muscleinfo_exercicio'].find_one_and_update({"_id": id, "user_id": usuario(request)}, {"$set": update_data})
-        #
+        
         # if not editar:
         #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
 
@@ -130,7 +160,7 @@ def deletar_exercicio(request, id: Union[int, str]):
         # MONGODB
         # id = ObjectId(id)
         # deletar = db['muscleinfo_exercicio'].find_one_and_delete({"_id": id, "user_id": usuario(request)})
-        #
+        
         # if not deletar:
         #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
 

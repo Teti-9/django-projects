@@ -6,6 +6,8 @@ Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful
 
 - 📌 **Exercícios:** CRUD (Criar, Ler, Atualizar, Deletar) de exercícios por nome ou músculo.  
 
+- 📈 **Progressão:** Calcule se houve progressão no exercício baseado em atualizações anteriores na database.  
+
 - 📊 **Cálculo de Volume de Treino:** Volume semanal total ou filtrado por músculo.  
 
 - 🔥 **Cálculo Calórico:** Retorna calorias totais com base em macronutrientes enviados via POST.  
@@ -20,6 +22,10 @@ Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful
 git clone https://github.com/Teti-9/django_ninja-postgres.git
 cd django_ninja-postgres
 pip install -r requirements.txt
+
+Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
+
+DATABASE = "sql" <- Deixe "sql" para utilizar SQLAlchemy/Django ORM.
 
 Altere a configuração de database para SQLite na pasta src > settings.py
 
