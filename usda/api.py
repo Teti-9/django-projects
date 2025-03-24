@@ -2,7 +2,6 @@ from ninja import Router
 from ninja.responses import JsonResponse
 from googletrans import Translator
 from .utils import buscar_alimento
-import asyncio
 
 router = Router()
 

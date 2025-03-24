@@ -1,13 +1,13 @@
 from ninja import Router
-from ninja.security import django_auth
+from argon2 import PasswordHasher
 from ninja.responses import JsonResponse
+from django.db.utils import IntegrityError
 from django.contrib.auth import authenticate, login, logout
 from .models import CustomUserModel as User
 from .schemas import CustomUserSchema
-from .utils import usuario
 from src.utils import database_auth
+from users.utils import usuario
 # MONGODB Imports
-from argon2 import PasswordHasher
 from mongodb.database import db
 import bson
 from bson import ObjectId
@@ -18,41 +18,36 @@ auth = database_auth()
 
 @router.post('/registrar')
 def registrar(request, usuario_: CustomUserSchema):
+    # SQL
+    if usuario(request):
+        return JsonResponse({"Message": "Não é possível se registrar estando logado em outra conta."}, status=404)
+
     try:
-        # SQL
-        usuario_logado = request.user.id
-
-        if usuario_logado:
-            return JsonResponse({"Message": "Não é possível se registrar estando logado em outra conta."}, status=404)
-
         User.objects.create_user(username=usuario_.email, email=usuario_.email, password=usuario_.password)
+    except IntegrityError:
+        return JsonResponse({"Message": "Email já cadastrado!"}, status=409)
 
-        # MONGODB
-        # usuario_existe = db['users'].find_one({"email": usuario_.email})
-        
-        # if usuario_existe:
-        #     return JsonResponse({"Message": "Email já cadastrado!"}, status=404)
-        
-        # if usuario(request):
-        #     return JsonResponse({"Message": "Não é possível se registrar estando logado em outra conta."}, status=404)
-        
-        # user = {
-        #     "email": usuario_.email,
-        #     "password": ph.hash(usuario_.password)
-        # }
-        # user = db['users'].insert_one(user)
-
-        return JsonResponse({"Message": "Usuário cadastrado com sucesso!"}, status=200)
+    # MONGODB
+    # usuario_existe = db['users'].find_one({"email": usuario_.email})
     
-    except Exception as e:
-        return JsonResponse({"Message": "Email já cadastrado!"}, status=404)
+    # if usuario_existe:
+    #     return JsonResponse({"Message": "Email já cadastrado!"}, status=409)
+    
+    # if usuario(request):
+    #     return JsonResponse({"Message": "Não é possível se registrar estando logado em outra conta."}, status=404)
+    
+    # user = {
+    #     "email": usuario_.email,
+    #     "password": ph.hash(usuario_.password)
+    # }
+    # user = db['users'].insert_one(user)
+
+    return JsonResponse({"Message": "Usuário cadastrado com sucesso!"}, status=200)
     
 @router.post('/logar')
 def logar(request, usuario_: CustomUserSchema):
     # SQL
-    usuario_logado = request.user.id
-
-    if usuario_logado:
+    if usuario(request):
         return JsonResponse({"Message": "Usuário já está autenticado!"}, status=404)
 
     user = authenticate(request, email=usuario_.email, password=usuario_.password)
