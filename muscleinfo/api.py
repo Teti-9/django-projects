@@ -2,6 +2,7 @@ from ninja import Router
 from ninja.responses import JsonResponse
 from django.utils import timezone
 from django.middleware.csrf import get_token
+from django.shortcuts import get_object_or_404
 from .models import Exercicio
 from .schemas import ExercicioSchema, ExercicioSchemaNoID, ExercicioSchemaEdit
 from typing import List, Union
@@ -10,8 +11,8 @@ from src.utils import database_auth
 # MONGODB Imports
 from mongodb.database import db
 from .utils import individual_serial, list_serial, regex_pattern
-import bson
 from bson import ObjectId
+from bson.errors import InvalidId
 
 router = Router()
 auth = database_auth()
@@ -50,125 +51,97 @@ def populardb(request, exercicio: ExercicioSchemaNoID):
 
 @router.get('/exercicio/nome/{nome}', response = List[ExercicioSchema], auth=auth)
 def procurar_exercicio_nome(request, nome: str):
-    try:
+    # SQL
+    exercicio = Exercicio.procurar.filter(nome__icontains=nome.title(), user_id = usuario(request))
 
-        # SQL
-        exercicio = Exercicio.objects.filter(nome__icontains=nome.title(), user_id = usuario(request))
+    # MONGODB
+    # exercicio = list_serial(db['muscleinfo_exercicio'].find({"nome": {"$regex": regex_pattern(nome)},
+    #                                                          "user_id": usuario(request)}))
 
-        # MONGODB
-        # exercicio = list_serial(db['muscleinfo_exercicio'].find({"nome": {"$regex": regex_pattern(nome)},
-        #                                                          "user_id": usuario(request)}))
-
-        if not exercicio:
-            return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-
-        return exercicio
-
-    except Exercicio.DoesNotExist:
+    if not exercicio:
         return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-    except Exception as e:
-        return JsonResponse({"Message": f"Erro: {str(e)}"}, status=500)
+
+    return exercicio
 
 @router.get('/exercicio/musculo/{musculo}', response=List[ExercicioSchema], auth=auth)
 def procurar_exercicio_musculo(request, musculo: str):
-    try:
-        # SQL
-        exercicios = Exercicio.objects.filter(musculo=musculo.title(), user_id = usuario(request)).all()
+    # SQL
+    exercicios = Exercicio.procurar.filter(musculo=musculo.title(), user_id = usuario(request))
 
-        # MONGODB
-        # exercicios = list_serial(db['muscleinfo_exercicio'].find({"musculo": {"$regex": regex_pattern(musculo)},
-        #                                                           "user_id": usuario(request)}))
+    # MONGODB
+    # exercicios = list_serial(db['muscleinfo_exercicio'].find({"musculo": {"$regex": regex_pattern(musculo)},
+    #                                                           "user_id": usuario(request)}))
 
-        if not exercicios:
-            return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
-
-        return exercicios
-
-    except Exercicio.DoesNotExist:
+    if not exercicios:
         return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
-    except Exception as e:
-        return JsonResponse({"Message": f"Erro: {str(e)}"}, status=500)
+
+    return exercicios
 
 @router.put('/exercicio/editar/{id}', response = ExercicioSchemaEdit, auth=auth)
 def editar_exercicio(request, id: Union[int, str], exercicio: ExercicioSchemaEdit):
-    try:
+    # SQL
+    exercicio_obj = get_object_or_404(Exercicio.procurar, id=id, user_id = usuario(request))
 
-        # SQL
-        exercicio_obj = Exercicio.objects.get(id=id, user_id = usuario(request))
+    exercicio_obj.carga_anterior = exercicio_obj.carga
+    exercicio_obj.repeticoes_anterior = exercicio_obj.repeticoes
+    exercicio_obj.data_anterior = exercicio_obj.data
 
-        exercicio_obj.carga_anterior = exercicio_obj.carga
-        exercicio_obj.repeticoes_anterior = exercicio_obj.repeticoes
-        exercicio_obj.data_anterior = exercicio_obj.data
-
-        for key, value in exercicio.dict().items():
-            if value is None:
-                pass
+    for key, value in exercicio.dict().items():
+        if value is None:
+            pass
+        else:
+            if isinstance(value, str):
+                setattr(exercicio_obj, key, value.title())
             else:
-                if isinstance(value, str):
-                    setattr(exercicio_obj, key, value.title())
-                else:
-                    setattr(exercicio_obj, key, value)
+                setattr(exercicio_obj, key, value)
 
-        exercicio_obj.data = timezone.now()
+    exercicio_obj.data = timezone.now()
 
-        exercicio_obj.save()
+    exercicio_obj.save()
 
-        # MONGODB
-        # id = ObjectId(id)
-        # exercicio_ = individual_serial(db['muscleinfo_exercicio'].find_one({"_id": id, "user_id": usuario(request)}))
+    # MONGODB
+    # try:
+    #     id = ObjectId(id)
+    #     exercicio_ = individual_serial(db['muscleinfo_exercicio'].find_one({"_id": id, "user_id": usuario(request)}))
+    # except InvalidId:
+    #     return JsonResponse({"Message": "ID inválido"}, status=404)
+    # except TypeError:
+    #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
+    
+    # old_values = {
+    #     "carga_anterior": exercicio_["carga"],
+    #     "repeticoes_anterior": exercicio_["repeticoes"],
+    #     "data_anterior": exercicio_["data"]
+    # }
 
-        # if not exercicio_:
-        #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-        
-        # old_values = {
-        #     "carga_anterior": exercicio_["carga"],
-        #     "repeticoes_anterior": exercicio_["repeticoes"],
-        #     "data_anterior": exercicio_["data"]
-        # }
+    # update_data = {}
 
-        # update_data = {}
+    # for key, value in exercicio.dict().items():
+    #     if value is not None:
+    #         update_data[key] = value.title() if isinstance(value, str) else value
 
-        # for key, value in exercicio.dict().items():
-        #     if value is not None:
-        #         update_data[key] = value.title() if isinstance(value, str) else value
+    # update_data["data"] = timezone.now().strftime('%d/%m/%Y')
+    # update_data.update(old_values)
 
-        # update_data["data"] = timezone.now().strftime('%d/%m/%Y')
-        # update_data.update(old_values)
+    # db['muscleinfo_exercicio'].find_one_and_update({"_id": id, "user_id": usuario(request)}, {"$set": update_data})
 
-        # editar = db['muscleinfo_exercicio'].find_one_and_update({"_id": id, "user_id": usuario(request)}, {"$set": update_data})
-        
-        # if not editar:
-        #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-
-        return JsonResponse({"Message": "Exercício atualizado com sucesso!"}, status=200)
-
-    except Exercicio.DoesNotExist:
-        return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-    except bson.errors.InvalidId:
-        return JsonResponse({"Message": "ID Inválido!"}, status=404)
-    except Exception as e:
-        return JsonResponse({"Message": f"Erro: {str(e)}"}, status=500)
+    return JsonResponse({"Message": "Exercício atualizado com sucesso!"}, status=200)
 
 @router.delete('/exercicio/deletar/{id}', auth=auth)
 def deletar_exercicio(request, id: Union[int, str]):
-    try:
+    # SQL
+    exercicio = get_object_or_404(Exercicio.objects, id=id, user_id = usuario(request))
+    exercicio.delete()
 
-        # SQL
-        exercicio = Exercicio.objects.get(id=id, user_id = usuario(request))
-        exercicio.delete()
+    # MONGODB
+    # try:
+    #     id = ObjectId(id)
+    #     individual_serial(db['muscleinfo_exercicio'].find_one({"_id": id, "user_id": usuario(request)}))
+    # except InvalidId:
+    #     return JsonResponse({"Message": "ID inválido"}, status=404)
+    # except TypeError:
+    #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
+    
+    # db['muscleinfo_exercicio'].find_one_and_delete({"_id": id, "user_id": usuario(request)})
 
-        # MONGODB
-        # id = ObjectId(id)
-        # deletar = db['muscleinfo_exercicio'].find_one_and_delete({"_id": id, "user_id": usuario(request)})
-        
-        # if not deletar:
-        #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-
-        return JsonResponse({"Message": "Exercício deletado com sucesso!"}, status=200)
-
-    except Exercicio.DoesNotExist:
-        return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
-    except bson.errors.InvalidId:
-        return JsonResponse({"Message": "ID Inválido!"}, status=404)
-    except Exception as e:
-        return JsonResponse({"Message": f"Erro: {str(e)}"}, status=500)
+    return JsonResponse({"Message": "Exercício deletado com sucesso!"}, status=200)

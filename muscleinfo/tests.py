@@ -9,10 +9,10 @@ class Testes(TestCase):
         self.client = Client()
         self.user = User.objects.create_user(username='teste', email='teste', password='teste')
         self.client.login(username='teste', password='teste')
-
+        
         self.exercicio = Exercicio.objects.create(
             nome="Teste", musculo="Teste", musculo_residual="Teste",
-            series=1, infos="Teste", user_id=self.user.id
+            series=0, carga=0, repeticoes=0, infos="Teste", user_id=self.user.id
         )
 
     def test_get_csrf_token(self):
@@ -25,6 +25,8 @@ class Testes(TestCase):
                                 "musculo": self.exercicio.musculo,
                                 "musculo_residual": self.exercicio.musculo_residual,
                                 "series": self.exercicio.series,
+                                "carga": self.exercicio.carga,
+                                "repeticoes": self.exercicio.repeticoes,
                                 "infos": self.exercicio.infos},
                                 content_type="application/json")
         self.assertEqual(response.status_code, 200)

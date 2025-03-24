@@ -6,7 +6,7 @@ from users.utils import usuario
 from src.utils import database_auth
 # MONGODB
 from mongodb.database import db
-from muscleinfo.utils import individual_serial, list_serial
+from muscleinfo.utils import list_serial
 
 router = Router()
 mongodb_auth = usuario
@@ -15,16 +15,13 @@ auth = database_auth()
 @router.get('/exercicio/volumes', auth=auth)
 def exercicio_volume_total(request):
     # SQL
-    exercicio = Exercicio.objects.filter(user_id = usuario(request)).all()
+    volume = Exercicio.procurar.filter(user_id = usuario(request))
 
     # MONGODB
-    # exercicio = list_serial(db['muscleinfo_exercicio'].find({"user_id": usuario(request)}))
+    # volume = list_serial(db['muscleinfo_exercicio'].find({"user_id": usuario(request)}))
 
-    if not exercicio:
-        return JsonResponse({"Message": "Volume não encontrado"}, status=404)
-
-    series = calcular_series(exercicio)
-    residual = calcular_residual(exercicio)
+    series = calcular_series(volume)
+    residual = calcular_residual(volume)
 
     response = {
             "Volume Primário": f"O volume primário total é de: {series}",
@@ -35,24 +32,18 @@ def exercicio_volume_total(request):
 
 @router.get('/exercicio/volume/{musculo}', auth=auth)
 def exercicio_volume_unico(request, musculo: str):
-    try:
-        # SQL
-        exercicio = Exercicio.objects.filter(musculo=musculo.title(), user_id = usuario(request)).all()
+    # SQL
+    volume = Exercicio.procurar.filter(musculo=musculo.title(), user_id = usuario(request))
 
-        # MONGODB
-        # exercicio = list_serial(db['muscleinfo_exercicio'].find({"musculo": musculo.title(), "user_id": usuario(request)}))
+    # MONGODB
+    # volume = list_serial(db['muscleinfo_exercicio'].find({"musculo": musculo.title(), "user_id": usuario(request)}))
 
-        if not exercicio:
-            return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
+    series = calcular_series(volume)
+    residual = calcular_residual(volume)
 
-        series = calcular_series(exercicio)
-        residual = calcular_residual(exercicio)
+    response = {
+        "Volume Primário": f"O volume primário total para o músculo é de: {series}",
+        "Volume Residual": f"O volume residual total para este músculo é de: {residual}"
+    }
 
-        response = {
-            "Volume Primário": f"O volume primário total para o músculo é de: {series}",
-            "Volume Residual": f"O volume residual total para este músculo é de: {residual}"
-        }
-
-        return response
-    except Exercicio.DoesNotExist:
-        return JsonResponse({"detail": "Músculo não encontrado"}, status=404)
+    return response
