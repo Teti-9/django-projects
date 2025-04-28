@@ -1,6 +1,6 @@
 ## Django-Ninja + PostgreSQL / MongoDB
 
-Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful dentro da framework escolhida (Django-Ninja) para um back-end rápido e eficiente.
+Esse projeto é um conjunto de aplicativos que fornecem API's RESTful's dentro da framework escolhida (Django-Ninja) para um back-end rápido e eficiente.
 
 ## Funcionalidades da API  
 
@@ -19,8 +19,8 @@ Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful
 
 ### 🔹 Instalação Local (SQLite)
 ```
-git clone https://github.com/Teti-9/django_ninja-postgres.git
-cd django_ninja-postgres
+git clone https://github.com/Teti-9/django-projects.git
+cd django-projects
 pip install -r requirements.txt
 
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
@@ -41,8 +41,8 @@ python manage.py runserver
 ```
 ### 🐳 Instalação com Docker + PostgreSQL
 ```
-git clone https://github.com/Teti-9/django_ninja-postgres.git
-cd django_ninja-postgres
+git clone https://github.com/Teti-9/django-projects.git
+cd django-projects
 
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 
