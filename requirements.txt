@@ -5,4 +5,6 @@ orjson
 psycopg2-binary
 python-dotenv
 argon2-cffi
+requests
 googletrans
+django-jazzmin

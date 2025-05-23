@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -89,10 +90,10 @@ WSGI_APPLICATION = 'src.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django_ninja_project',
-        'USER': os.environ.get("POSTGRESQL_USER"),
-        'PASSWORD': os.environ.get("POSTGRESQL_PASS"),
-        'HOST': 'postgresqldb_django',
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASS"),
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

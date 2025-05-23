@@ -8,6 +8,7 @@ class CustomUserModel(AbstractUser):
         related_name="customuser_groups",
         blank=True,
     )
+
     user_permissions = models.ManyToManyField(
         Permission,
         related_name="customuser_perms",

@@ -10,7 +10,7 @@ class ExercicioSchema(Schema):
     musculo_residual: str
     series: int
     carga: int
-    repeticoes: float
+    repeticoes: int
     infos: str
     data: Union[datetime, str]
 
@@ -27,7 +27,7 @@ class ExercicioSchemaNoID(Schema):
     musculo_residual: str
     series: int
     carga: int
-    repeticoes: float
+    repeticoes: int
     infos: str
 
 class ExercicioSchemaEdit(Schema):
@@ -36,5 +36,5 @@ class ExercicioSchemaEdit(Schema):
     musculo_residual: Optional[str] = None
     series: Optional[int] = None
     carga: Optional[int] = None
-    repeticoes: Optional[float] = None
+    repeticoes: Optional[int] = None
     infos: Optional[str] = None

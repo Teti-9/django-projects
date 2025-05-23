@@ -1,6 +1,6 @@
 from ninja import Router
-from ninja.responses import JsonResponse
 from .utils import calcular_series, calcular_residual
+from django.shortcuts import get_list_or_404
 from muscleinfo.models import Exercicio
 from users.utils import usuario
 from src.utils import database_auth
@@ -9,13 +9,14 @@ from mongodb.database import db
 from muscleinfo.utils import list_serial
 
 router = Router()
-mongodb_auth = usuario
 auth = database_auth()
 
 @router.get('/exercicio/volumes', auth=auth)
 def exercicio_volume_total(request):
     # SQL
-    volume = Exercicio.procurar.filter(user_id = usuario(request))
+    volume = get_list_or_404(
+        Exercicio.procurar.filter(
+            user_id = usuario(request)))
 
     # MONGODB
     # volume = list_serial(db['muscleinfo_exercicio'].find({"user_id": usuario(request)}))
@@ -33,7 +34,10 @@ def exercicio_volume_total(request):
 @router.get('/exercicio/volume/{musculo}', auth=auth)
 def exercicio_volume_unico(request, musculo: str):
     # SQL
-    volume = Exercicio.procurar.filter(musculo=musculo.title(), user_id = usuario(request))
+    volume = get_list_or_404(
+        Exercicio.procurar.filter(
+            musculo=musculo.title(), 
+            user_id = usuario(request)))
 
     # MONGODB
     # volume = list_serial(db['muscleinfo_exercicio'].find({"musculo": musculo.title(), "user_id": usuario(request)}))

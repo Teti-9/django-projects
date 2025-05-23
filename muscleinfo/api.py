@@ -2,7 +2,7 @@ from ninja import Router
 from ninja.responses import JsonResponse
 from django.utils import timezone
 from django.middleware.csrf import get_token
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from .models import Exercicio
 from .schemas import ExercicioSchema, ExercicioSchemaNoID, ExercicioSchemaEdit
 from typing import List, Union
@@ -49,38 +49,47 @@ def populardb(request, exercicio: ExercicioSchemaNoID):
     # update_data['id'] = str(exercicio.inserted_id)
     # return update_data
 
-@router.get('/exercicio/nome/{nome}', response = List[ExercicioSchema], auth=auth)
+@router.get('/exercicio/nome/{nome}', response = Union[List[ExercicioSchema], ExercicioSchema], auth=auth)
 def procurar_exercicio_nome(request, nome: str):
     # SQL
-    exercicio = Exercicio.procurar.filter(nome__icontains=nome.title(), user_id = usuario(request))
+    exercicio = get_list_or_404(
+        Exercicio.procurar.filter(
+            nome__icontains=nome.title(), 
+            user_id = usuario(request)))
 
     # MONGODB
     # exercicio = list_serial(db['muscleinfo_exercicio'].find({"nome": {"$regex": regex_pattern(nome)},
     #                                                          "user_id": usuario(request)}))
 
-    if not exercicio:
-        return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
+    # if not exercicio:
+    #     return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
 
     return exercicio
 
-@router.get('/exercicio/musculo/{musculo}', response=List[ExercicioSchema], auth=auth)
+@router.get('/exercicio/musculo/{musculo}', response = Union[List[ExercicioSchema], ExercicioSchema], auth=auth)
 def procurar_exercicio_musculo(request, musculo: str):
     # SQL
-    exercicios = Exercicio.procurar.filter(musculo=musculo.title(), user_id = usuario(request))
+    exercicios = get_list_or_404(
+        Exercicio.procurar.filter(
+            musculo=musculo.title(), 
+            user_id = usuario(request)))
 
     # MONGODB
     # exercicios = list_serial(db['muscleinfo_exercicio'].find({"musculo": {"$regex": regex_pattern(musculo)},
     #                                                           "user_id": usuario(request)}))
 
-    if not exercicios:
-        return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
+    # if not exercicios:
+    #     return JsonResponse({"Message": "Músculo não encontrado"}, status=404)
 
     return exercicios
 
 @router.put('/exercicio/editar/{id}', response = ExercicioSchemaEdit, auth=auth)
 def editar_exercicio(request, id: Union[int, str], exercicio: ExercicioSchemaEdit):
     # SQL
-    exercicio_obj = get_object_or_404(Exercicio.procurar, id=id, user_id = usuario(request))
+    exercicio_obj = get_object_or_404(
+        Exercicio.procurar, 
+        id=id, 
+        user_id = usuario(request))
 
     exercicio_obj.carga_anterior = exercicio_obj.carga
     exercicio_obj.repeticoes_anterior = exercicio_obj.repeticoes
@@ -130,7 +139,11 @@ def editar_exercicio(request, id: Union[int, str], exercicio: ExercicioSchemaEdi
 @router.delete('/exercicio/deletar/{id}', auth=auth)
 def deletar_exercicio(request, id: Union[int, str]):
     # SQL
-    exercicio = get_object_or_404(Exercicio.objects, id=id, user_id = usuario(request))
+    exercicio = get_object_or_404(
+        Exercicio.objects, 
+        id=id, 
+        user_id = usuario(request))
+    
     exercicio.delete()
 
     # MONGODB

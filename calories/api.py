@@ -20,6 +20,15 @@ def calorias(request, caloria: CaloriaSchema):
     proteina = caloria.proteina * PROTEINA
     gordura = caloria.gordura * GORDURA
 
-    calculo = carboidrato + proteina + gordura
+    calculo_calorias = carboidrato + proteina + gordura
 
-    return JsonResponse({"Calorias": calculo}, status=200)
+    response = {
+        "Calorias": {
+            "Total": calculo_calorias,
+            "Carboidrato": carboidrato,
+            "Proteina": proteina,
+            "Gordura": gordura
+        }
+    }
+
+    return JsonResponse({"Resultado": response}, status=200)

@@ -19,8 +19,9 @@ Esse projeto é uma junção de outros projetos meus que fornece uma API RESTful
 
 ### 🔹 Instalação Local (SQLite)
 ```
-git clone https://github.com/Teti-9/django_ninja-postgres.git
-cd django_ninja-postgres
+git clone https://github.com/Teti-9/django-projects.git
+cd django-projects
+
 pip install -r requirements.txt
 
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
@@ -41,28 +42,33 @@ python manage.py runserver
 ```
 ### 🐳 Instalação com Docker + PostgreSQL
 ```
-git clone https://github.com/Teti-9/django_ninja-postgres.git
-cd django_ninja-postgres
+git clone https://github.com/Teti-9/django-projects.git
+cd django-projects
 
 Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 
-POSTGRESQL_VERSION = 15
-POSTGRESQL_USER = "usuario"
-POSTGRESQL_PASS = "senha"
+POSTGRES_DB = "postgres"
+POSTGRES_USER = "usuario"
+POSTGRES_PASS = "senha"
 DATABASE = "sql" <- Deixe "sql" para utilizar SQLAlchemy/Django ORM.
 
 Rode o comando:
-docker compose up -d
+docker-compose up db --build
+docker compose up
 ```
 ### 🍃 Configuração MongoDB
 ```
+git clone https://github.com/Teti-9/django-projects.git
+cd django-projects
+pip install -r requirements.txt
+
 Não é necessário editar o arquivo settings.py.
 
 Crie uma database MongoDB com as seguintes collections:
 muscleinfo_exercicio
 users
 
-Crie caso ainda não tenha um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
+Crie um arquivo .env na raiz do projeto com as seguintes variáveis de ambiente:
 
 MONGODB_URL = "mongodb+srv://usuario:senha@nomedatabase.ourq7.mongodb.net/"
 DATABASE = "mongodb"
@@ -76,16 +82,14 @@ Apenas comente os comandos SQL e descomente os comandos MongoDB.
 Rode o comando para executar o servidor de acordo com a instalação escolhida acima.
 ```
 ## 🗂️ Estrutura do Back-end
+```
 - Cada funcionalidade está organizada em um app separado.  
 - O arquivo `api.py` dentro de cada app contém os endpoints disponíveis.  
+```
 
 ## 📄 Documentação
 ```
 Siga os passos para instalação e inicie o servidor para ter acesso a documentação.
 
-Local :
-http://127.0.0.1:8000/api/docs
-
-Docker :
 http://localhost:8000/api/docs
 ```

@@ -14,8 +14,10 @@ auth = database_auth()
 @router.get('/exercicio/progressao/{nome}', auth=auth)
 def progressao(request, nome: str):
     # SQL
-    exercicio = Exercicio.procurar.filter(nome__icontains=nome.title(), user_id = usuario(request)).first()
-
+    exercicio = Exercicio.procurar.filter(
+        nome__icontains=nome.title(), 
+        user_id = usuario(request)).first()
+    
     if not exercicio:
         return JsonResponse({"Message": "Exercício não encontrado"}, status=404)
 
@@ -32,9 +34,11 @@ def progressao(request, nome: str):
     data_anterior = exercicio.get("data_anterior") if isinstance(exercicio, dict) else getattr(exercicio, "data_anterior", None)
 
     try:
+
         data = data.strftime('%d/%m/%Y')
         data_anterior = exercicio.get("data_anterior") if isinstance(exercicio, dict) else getattr(exercicio, "data_anterior", None)
         data_anterior = data_anterior.strftime('%d/%m/%Y')
+        
     except:
         pass
     
@@ -59,7 +63,7 @@ def progressao(request, nome: str):
         "Carga": exercicio.get("carga") if isinstance(exercicio, dict) else getattr(exercicio, "carga", None),
         "Carga Anterior": exercicio.get("carga_anterior") if isinstance(exercicio, dict) else getattr(exercicio, "carga_anterior", None),
         "Repetições": exercicio.get("repeticoes") if isinstance(exercicio, dict) else getattr(exercicio, "repeticoes", None),
-        "Repetições Anterior": exercicio.get("repeticoes_anterior") if isinstance(exercicio, dict) else getattr(exercicio, "repeticoes_anterior", None),
+        "Repetições Anteriores": exercicio.get("repeticoes_anterior") if isinstance(exercicio, dict) else getattr(exercicio, "repeticoes_anterior", None),
         "Data": data,
         "Data Anterior": data_anterior,
         "Conclusão": message
